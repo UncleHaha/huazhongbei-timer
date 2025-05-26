@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>辩论计时器</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: #2a4f6d;
+    }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+    #navigation {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    #scene-name {
+      position: absolute;
+      top: 150px;
+      width: 100%;
+      text-align: center;
+      font-size: 6em;
+      font-weight: bold;
+    }
+    #timer {
+      position: absolute;
+      top: 35vh;
+      width: 100%;
+      text-align: center;
+      font-size: 14em;
+      font-weight: bold;
+    }
+    .buttons {
+      position: absolute;
+      bottom: 60px;
+      width: 100%;
+      text-align: center;
+    }
+    button {
+      font-size: 1em;
+      margin: 0 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      background-color: #ffffff;
+      color: #2a4f6d;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <button onclick="prevScene()">← 上一页</button>
+  </div>
+  <div id="navigation">
+    <button onclick="nextScene()">下一页 →</button>
+  </div>
+  <div id="scene-name"></div>
+  <div id="timer">00:00</div>
+  <div class="buttons">
+    <button onclick="startTimer()">开始</button>
+    <button onclick="pauseTimer()">暂停</button>
+    <button onclick="resetTimer()">重置</button>
+  </div>
+  <audio id="alert-sound"></audio>
+  <script>
+    const SCENES = [
+      { name: "申论", time: 240, background: "assets/images/2.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "质询", time: 180, background: "assets/images/3.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "中休", time: 120, background: "assets/images/4.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "总结", time: 240, background: "assets/images/5.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "评审缓冲", time: 300, background: "assets/images/7.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "点评", time: 600, background: "assets/images/8.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "补充", time: 120, background: "assets/images/9.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "赛果公布", time: 1, background: "assets/images/10.png", alerts: [] }
+    ];
+    let currentIndex = 0;
+    let timerInterval = null;
+    let currentTime = 0;
+    const sceneName = document.getElementById("scene-name");
+    const timerDisplay = document.getElementById("timer");
+    const alertSound = document.getElementById("alert-sound");
+
+    function formatTime(sec) {
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+    function updateDisplay() {
+      timerDisplay.textContent = formatTime(currentTime);
+    }
+    function loadScene(index) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      currentIndex = index;
+      const scene = SCENES[index];
+
+      const isResultPage = scene.name.includes("赛果");
+
+
+    document.getElementById("scene-name").style.display = isResultPage ? "none" : "block";
+    document.getElementById("timer").style.display = isResultPage ? "none" : "block";
+    document.querySelector(".buttons").style.display = "block"; // 按钮永远显示
+
+    currentTime = scene.time;
+    document.body.style.backgroundImage = `url('${scene.background}')`;
+    sceneName.textContent = scene.name;
+    updateDisplay();
+  }
+
+    function startTimer() {
+      if (timerInterval) return;
+      timerInterval = setInterval(() => {
+        currentTime--;
+        updateDisplay();
+        SCENES[currentIndex].alerts.forEach(alert => {
+          if (alert.time === currentTime) {
+            alertSound.src = alert.sound;
+            alertSound.play();
+          }
+        });
+        if (currentTime <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+      }, 1000);
+    }
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      currentTime = SCENES[currentIndex].time;
+      updateDisplay();
+    }
+    function nextScene() {
+      if (currentIndex < SCENES.length - 1) {
+        loadScene(currentIndex + 1);
+      }
+    }
+    function prevScene() {
+      if (currentIndex > 0) {
+        loadScene(currentIndex - 1);
+      }
+    }
+    loadScene(0);
+  </script>
+</body>
+</html>
