@@ -26,12 +26,7 @@
       right: 10px;
     }
     #scene-name {
-      position: absolute;
-      top: 150px;
-      width: 100%;
-      text-align: center;
-      font-size: 6em;
-      font-weight: bold;
+      display: none;
     }
     #timer {
       position: absolute;
@@ -120,7 +115,6 @@
 
     currentTime = scene.time;
     document.body.style.backgroundImage = `url('${scene.background}')`;
-    sceneName.textContent = scene.name;
     updateDisplay();
   }
 
