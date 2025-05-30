@@ -13,7 +13,7 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      color: #2a4f6d;
+      color: #b84730;
     }
     #controls {
       position: absolute;
@@ -50,7 +50,7 @@
       border-radius: 10px;
       font-weight: bold;
       background-color: #ffffff;
-      color: #2a4f6d;
+      color: #b84730;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       cursor: pointer;
     }
@@ -74,16 +74,20 @@
     <button onclick="resetTimer()">重置</button>
   </div>
   <audio id="alert-sound"></audio>
+    <audio id="jazz-player" loop>
+    <source src="assets/sounds/jazz.mp3" type="audio/mpeg" />
+    </audio>
   <script>
     const SCENES = [
-      { name: "申论", time: 240, background: "assets/images/2.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
-      { name: "质询", time: 180, background: "assets/images/3.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
-      { name: "中休", time: 120, background: "assets/images/4.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
-      { name: "总结", time: 240, background: "assets/images/5.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
-      { name: "评审缓冲", time: 300, background: "assets/images/7.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
-      { name: "点评", time: 600, background: "assets/images/8.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
-      { name: "补充", time: 120, background: "assets/images/9.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
-      { name: "赛果公布", time: 1, background: "assets/images/10.png", alerts: [] }
+      { name: "开始", time: 1, background: "assets/images/3.png", alerts: [] },
+      { name: "申论", time: 240, background: "assets/images/7.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "质询", time: 180, background: "assets/images/8.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "中休", time: 120, background: "assets/images/9.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "总结", time: 240, background: "assets/images/10.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "评审缓冲", time: 1, background: "assets/images/11.png", alerts: [] },
+      { name: "点评", time: 600, background: "assets/images/12.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "补充", time: 120, background: "assets/images/13.png", alerts: [{time: 30, sound: "assets/sounds/30s.mp3"}, {time: 0, sound: "assets/sounds/timeup.mp3"}] },
+      { name: "赛果公布", time: 1, background: "assets/images/14.png", alerts: [] }
     ];
     let currentIndex = 0;
     let timerInterval = null;
@@ -105,13 +109,21 @@
       timerInterval = null;
       currentIndex = index;
       const scene = SCENES[index];
+      const jazzPlayer = document.getElementById("jazz-player");
+      jazzPlayer.pause();
+      jazzPlayer.currentTime = 0;
+      if (scene.name === "评审缓冲") {
+        jazzPlayer.play();
+      }
 
-      const isResultPage = scene.name.includes("赛果");
+      const isResultPage = scene.name.includes("开始") || scene.name.includes("评审缓冲") || scene.name.includes("赛果");
 
 
     document.getElementById("scene-name").style.display = isResultPage ? "none" : "block";
     document.getElementById("timer").style.display = isResultPage ? "none" : "block";
-    document.querySelector(".buttons").style.display = "block"; // 按钮永远显示
+    const hideButtons = ["开始", "评审缓冲", "赛果公布"];
+      document.querySelector(".buttons").style.display = hideButtons.includes(scene.name) ? "none" : "block";
+
 
     currentTime = scene.time;
     document.body.style.backgroundImage = `url('${scene.background}')`;
