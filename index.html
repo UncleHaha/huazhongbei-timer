@@ -74,6 +74,9 @@
     <button onclick="resetTimer()">重置</button>
   </div>
   <audio id="alert-sound"></audio>
+    <audio id="jazz-player" loop>
+    <source src="assets/sounds/jazz.mp3" type="audio/mpeg" />
+    </audio>
   <script>
     const SCENES = [
       { name: "开始", time: 1, background: "assets/images/3.png", alerts: [] },
@@ -106,13 +109,19 @@
       timerInterval = null;
       currentIndex = index;
       const scene = SCENES[index];
+      const jazzPlayer = document.getElementById("jazz-player");
+      jazzPlayer.pause();
+      jazzPlayer.currentTime = 0;
+      if (scene.name === "评审缓冲") {
+        jazzPlayer.play();
+      }
 
       const isResultPage = scene.name.includes("开始") || scene.name.includes("评审缓冲") || scene.name.includes("赛果");
 
 
     document.getElementById("scene-name").style.display = isResultPage ? "none" : "block";
     document.getElementById("timer").style.display = isResultPage ? "none" : "block";
-    document.querySelector(".buttons").style.display = "block"; 
+    document.querySelector(".buttons").style.display = (scene.name === "开始") ? "none" : "block";
 
     currentTime = scene.time;
     document.body.style.backgroundImage = `url('${scene.background}')`;
