@@ -121,7 +121,9 @@
 
     document.getElementById("scene-name").style.display = isResultPage ? "none" : "block";
     document.getElementById("timer").style.display = isResultPage ? "none" : "block";
-    document.querySelector(".buttons").style.display = (scene.name === "开始") ? "none" : "block";
+    const hideButtons = ["开始", "评审缓冲", "赛果公布"];
+      document.querySelector(".buttons").style.display = hideButtons.includes(scene.name) ? "none" : "block";
+
 
     currentTime = scene.time;
     document.body.style.backgroundImage = `url('${scene.background}')`;
