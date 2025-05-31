@@ -138,6 +138,7 @@
         SCENES[currentIndex].alerts.forEach(alert => {
           if (alert.time === currentTime) {
             alertSound.src = alert.sound;
+            alertSound.volume = 1.0;
             alertSound.play();
           }
         });
